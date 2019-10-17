@@ -9,22 +9,28 @@ import androidx.recyclerview.widget.RecyclerView
 
 import com.atimi.cvapp.R
 import com.atimi.cvapp.databinding.PersonalDetailsViewBinding
+import com.atimi.cvapp.databinding.PersonalStatementViewBinding
 import com.atimi.cvapp.model.CvEntry
 import com.atimi.cvapp.model.PersonalDetails
+import com.atimi.cvapp.model.PersonalStatement
 
 class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
 
     private var entries: List<CvEntry> = emptyList()
 
-    private val personalDetails = 0
-    private val personalStatement = 1
-    private val experienceHeader = 2
-    private val experienceEntry = 3
-    private val educationHeader = 4
-    private val educationEntry = 5
+    private val personalDetails = 1
+    private val personalStatement = 2
+    private val experienceHeader = 3
+    private val experienceEntry = 4
+    private val educationHeader = 5
+    private val educationEntry = 6
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return PersonalDetailsViewHolder(parent)
+        if (viewType == personalDetails) {
+            return PersonalDetailsViewHolder(parent)
+        } else {
+            return PersonalStatementViewHolder(parent)
+        }
     }
 
     override fun getItemCount() = entries.size
@@ -36,6 +42,10 @@ class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
         if (holder is PersonalDetailsViewHolder && getItemViewType(position) == personalDetails) {
             val personalDetails = entries[position] as PersonalDetails
             holder.bind(personalDetails)
+        } else
+        if (holder is PersonalStatementViewHolder && getItemViewType(position) == personalStatement) {
+            val personalStatement = entries[position] as PersonalStatement
+            holder.bind(personalStatement)
         }
     }
 
@@ -44,7 +54,13 @@ class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
         notifyDataSetChanged()
     }
 
-    override fun getItemViewType(position: Int) = personalDetails
+    override fun getItemViewType(position: Int): Int {
+        if (entries[position].getType() == "Personal Details") {
+            return personalDetails
+        } else {
+            return personalStatement
+        }
+    }
 
     abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
@@ -60,6 +76,20 @@ class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
         fun bind(item: PersonalDetails) {
             binding.name = item.name
             binding.surname = item.surname
+        }
+    }
+
+    class PersonalStatementViewHolder(
+        private val parent: ViewGroup,
+        private val binding: PersonalStatementViewBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(parent.context),
+            R.layout.personal_statement_view,
+            parent,
+            false
+        )
+    ) : ViewHolder(binding.root) {
+        fun bind(item: PersonalStatement) {
+            binding.statement = item.statement
         }
     }
 }

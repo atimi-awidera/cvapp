@@ -75,4 +75,11 @@ class ExampleUnitTest {
         """.trimIndent())
         Assert.assertEquals(cvDocument, cvJSONDocument)
     }
+
+    @Test
+    fun fromJSONString_malformedIsEmpty() {
+        val cvDocument = CvDocument()
+        var cvJSONDocument = documentFactory.fromJSONString("""{}AS}asd[]""".trimIndent())
+        Assert.assertEquals(cvDocument, cvJSONDocument)
+    }
 }

@@ -22,12 +22,17 @@ class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
 
     private var entries: List<CvEntry> = emptyList()
 
+    //This should always be private, I know it might be tempting to use it in the CvDocument and
+    //it would "save" some lines but it'll also create strong linkage between the two making the
+    //code less reusable
     private val personalDetails = 1
     private val personalStatement = 2
     private val experienceHeader = 3
     private val experienceEntry = 4
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        //Consider NullHolder instead of falling back to ExperienceEntry if you wish to make it
+        //more general and re-usable
         if (viewType == personalDetails) {
             return PersonalDetailsViewHolder(parent)
         } else if (viewType == personalStatement) {
@@ -37,6 +42,7 @@ class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
         } else {
             return ExperienceEntryViewHolder(parent)
         }
+
     }
 
     override fun getItemCount() = entries.size
@@ -81,6 +87,10 @@ class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
     }
 
     abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
+
+    //
+    // ViewHolders - Consider moving them to separate files when the number grows
+    //
 
     class PersonalDetailsViewHolder(
         private val parent: ViewGroup,
@@ -142,8 +152,7 @@ class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
     }
 }
 
-// Avoid the Gradle 3.3 Gradle Plugin
-// Kotlin compiler warning Binding adapter AK(...) already exists for entries
+// Avoid the Gradle 3.3 Gradle Plugin Kotlin compiler warning Binding adapter AK(...) already exists for entries
 @BindingAdapter("entries")
 fun RecyclerView.bindItems(items: List<CvEntry>) {
     val adapter = adapter as CvAdapter

@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="cvViewModel"
             type="com.atimi.cvapp.ui.main.CvViewModel" />

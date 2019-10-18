@@ -4,7 +4,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
-class ExampleUnitTest {
+class CvDocumentFactoryTest {
 
     private lateinit var documentFactory: CvDocumentFactory
 
@@ -26,7 +26,8 @@ class ExampleUnitTest {
         val personalStatement = PersonalStatement("C")
         val cvDocument = CvDocument(personalDetails, personalStatement)
 
-        var cvJSONDocument = documentFactory.fromJSONString("""
+        var cvJSONDocument = documentFactory.fromJSONString(
+            """
             {
                 personalDetails: {
                     name:"A",
@@ -36,7 +37,8 @@ class ExampleUnitTest {
                     statement:"C"
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         Assert.assertEquals(cvDocument, cvJSONDocument)
     }
 
@@ -46,13 +48,15 @@ class ExampleUnitTest {
         val personalStatement = PersonalStatement("C")
         val experienceHeader = ExperienceHeader("W")
         val experienceEntries = mutableListOf<ExperienceEntry>()
-        experienceEntries.add(ExperienceEntry("A","0-1","A1"))
-        experienceEntries.add(ExperienceEntry("B","2-3","B1"))
-        experienceEntries.add(ExperienceEntry("C","4-5","C1"))
-        experienceEntries.add(ExperienceEntry("D","6-7","D1"))
-        experienceEntries.add(ExperienceEntry("E","8-9","E1"))
-        val cvDocument = CvDocument(personalDetails, personalStatement, experienceHeader, experienceEntries)
-        var cvJSONDocument = documentFactory.fromJSONString("""
+        experienceEntries.add(ExperienceEntry("A", "0-1", "A1"))
+        experienceEntries.add(ExperienceEntry("B", "2-3", "B1"))
+        experienceEntries.add(ExperienceEntry("C", "4-5", "C1"))
+        experienceEntries.add(ExperienceEntry("D", "6-7", "D1"))
+        experienceEntries.add(ExperienceEntry("E", "8-9", "E1"))
+        val cvDocument =
+            CvDocument(personalDetails, personalStatement, experienceHeader, experienceEntries)
+        var cvJSONDocument = documentFactory.fromJSONString(
+            """
             {
                 personalDetails: {
                     name:"A",
@@ -72,7 +76,8 @@ class ExampleUnitTest {
                     { company="E", timeframe="8-9", description="E1" }
                 ]
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         Assert.assertEquals(cvDocument, cvJSONDocument)
     }
 

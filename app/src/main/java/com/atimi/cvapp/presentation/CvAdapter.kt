@@ -6,17 +6,12 @@ import android.view.ViewGroup
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-
 import com.atimi.cvapp.R
+import com.atimi.cvapp.databinding.ExperienceEntryViewBinding
+import com.atimi.cvapp.databinding.ExperienceHeaderViewBinding
 import com.atimi.cvapp.databinding.PersonalDetailsViewBinding
 import com.atimi.cvapp.databinding.PersonalStatementViewBinding
-import com.atimi.cvapp.databinding.ExperienceHeaderViewBinding
-import com.atimi.cvapp.databinding.ExperienceEntryViewBinding
-import com.atimi.cvapp.model.CvEntry
-import com.atimi.cvapp.model.PersonalDetails
-import com.atimi.cvapp.model.PersonalStatement
-import com.atimi.cvapp.model.ExperienceHeader
-import com.atimi.cvapp.model.ExperienceEntry
+import com.atimi.cvapp.model.*
 
 class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
 
@@ -48,25 +43,25 @@ class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
     override fun getItemCount() = entries.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if ( position >= entries.size ) {
+        if (position >= entries.size) {
             return
         }
         if (holder is PersonalDetailsViewHolder && getItemViewType(position) == personalDetails) {
             val personalDetails = entries[position] as PersonalDetails
             holder.bind(personalDetails)
         } else
-        if (holder is PersonalStatementViewHolder && getItemViewType(position) == personalStatement) {
-            val personalStatement = entries[position] as PersonalStatement
-            holder.bind(personalStatement)
-        } else
-        if (holder is ExperienceHeaderViewHolder && getItemViewType(position) == experienceHeader) {
-            val experienceHeader = entries[position] as ExperienceHeader
-            holder.bind(experienceHeader)
-        } else
-        if (holder is ExperienceEntryViewHolder && getItemViewType(position) == experienceEntry) {
-            val experienceEntry = entries[position] as ExperienceEntry
-            holder.bind(experienceEntry)
-        }
+            if (holder is PersonalStatementViewHolder && getItemViewType(position) == personalStatement) {
+                val personalStatement = entries[position] as PersonalStatement
+                holder.bind(personalStatement)
+            } else
+                if (holder is ExperienceHeaderViewHolder && getItemViewType(position) == experienceHeader) {
+                    val experienceHeader = entries[position] as ExperienceHeader
+                    holder.bind(experienceHeader)
+                } else
+                    if (holder is ExperienceEntryViewHolder && getItemViewType(position) == experienceEntry) {
+                        val experienceEntry = entries[position] as ExperienceEntry
+                        holder.bind(experienceEntry)
+                    }
     }
 
     fun update(items: List<CvEntry>) {

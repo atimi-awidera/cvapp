@@ -1,7 +1,7 @@
 package com.atimi.cvapp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.atimi.cvapp.ui.main.CvFragment
 
 class MainActivity : AppCompatActivity() {

@@ -4,12 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="company"
             type="String" />
+
         <variable
             name="timeframe"
             type="String" />
+
         <variable
             name="description"
             type="String" />

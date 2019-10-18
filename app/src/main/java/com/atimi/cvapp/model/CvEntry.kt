@@ -15,5 +15,5 @@ interface CvEntry {
      *
      * @return string representing type of the entry
      */
-    fun getType():String
+    fun getType(): String
 }

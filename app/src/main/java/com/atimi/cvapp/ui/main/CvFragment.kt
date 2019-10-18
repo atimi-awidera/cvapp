@@ -1,21 +1,23 @@
 package com.atimi.cvapp.ui.main
 
 import android.Manifest
-import android.os.*
-import androidx.lifecycle.ViewModelProviders
-import androidx.fragment.app.Fragment
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 import com.atimi.cvapp.databinding.CvFragmentBinding
 import com.atimi.cvapp.presentation.CvAdapter
 import kotlinx.android.synthetic.main.cv_fragment.*
-import android.util.Log
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 
 class CvFragment() : Fragment(), OnRefreshListener {
 

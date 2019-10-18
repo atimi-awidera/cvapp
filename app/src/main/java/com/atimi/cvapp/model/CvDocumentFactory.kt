@@ -1,6 +1,5 @@
 package com.atimi.cvapp.model
 
-import android.util.Log
 import com.google.gson.Gson
 import java.lang.Exception
 
@@ -13,7 +12,7 @@ import java.lang.Exception
  * This should be an implementing an interface if we ever wanted to mock it
  */
 class CvDocumentFactory {
-    val gson:Gson = Gson()
+    val gson: Gson = Gson()
 
     private val TAG = "CvDocumentFactory"
 
@@ -25,8 +24,8 @@ class CvDocumentFactory {
      *
      * @return valid CvDocument or an empty CvDocument when failed
      */
-    fun fromJSONString(jsonString: String) : CvDocument {
-        var document:CvDocument
+    fun fromJSONString(jsonString: String): CvDocument {
+        var document: CvDocument
         try {
             document = gson.fromJson(jsonString, CvDocument::class.java)
         } catch (e: Exception) {

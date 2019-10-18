@@ -15,6 +15,7 @@ import java.net.URL
 class CvRepository {
 
     private val TAG = "CvRepository"
+    private val CV_FILE_NAME = "cv.json"
 
     var document:CvDocument = CvDocument()
 
@@ -24,7 +25,7 @@ class CvRepository {
 
     fun clean(context: Context) {
         val jsonFile = File(context.getExternalFilesDir(
-            Environment.DIRECTORY_DOCUMENTS), "cv.json")
+            Environment.DIRECTORY_DOCUMENTS), CV_FILE_NAME)
         if (jsonFile.exists() && jsonFile.isFile) {
             jsonFile.delete()
         }
@@ -32,7 +33,7 @@ class CvRepository {
 
     fun isValid(context: Context) : Boolean {
         val jsonFile = File(context.getExternalFilesDir(
-            Environment.DIRECTORY_DOCUMENTS), "cv.json")
+            Environment.DIRECTORY_DOCUMENTS), CV_FILE_NAME)
         return jsonFile.exists() && jsonFile.isFile
     }
 
@@ -64,8 +65,7 @@ class CvRepository {
                     val outFile = File(
                         context.getExternalFilesDir(
                             Environment.DIRECTORY_DOCUMENTS
-                        ), "cv.json"
-                    )
+                        ), CV_FILE_NAME )
                     if (outFile.exists()) {
                         outFile.delete()
                     }
@@ -82,7 +82,7 @@ class CvRepository {
     fun restore(context: Context, callback: OnDocumentReadyCallback) {
         doAsync {
             val jsonFile = File(context.getExternalFilesDir(
-                Environment.DIRECTORY_DOCUMENTS), "cv.json")
+                Environment.DIRECTORY_DOCUMENTS), CV_FILE_NAME)
             val jsonString = jsonFile.readText()
             //This can fail, needs checking and proper error handling
             val cvDocument = CvDocumentFactory().fromJSONString(jsonString)

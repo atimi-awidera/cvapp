@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">CvApp</string>
-    <string name="remote_cv_url">https://gist.githubusercontent.com/atimi-awidera/8e57d1051cb0ff9555d14f6c9219717b/raw/20fdec6ce410c3fcb136e788a1c75694bc964208/default_cv.json</string>
+    <string name="remote_cv_url">https://gist.githubusercontent.com/atimi-awidera/8e57d1051cb0ff9555d14f6c9219717b/raw/801b6e3070719006f0917ddf1831f15d595cc179/default_cv.json</string>
 </resources>

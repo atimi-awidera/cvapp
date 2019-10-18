@@ -1,10 +1,8 @@
 package com.atimi.cvapp.ui.main
 
 import android.Manifest
-import android.os.Build
+import android.os.*
 import androidx.lifecycle.ViewModelProviders
-import android.os.Bundle
-import android.os.Environment
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -17,8 +15,9 @@ import com.atimi.cvapp.databinding.CvFragmentBinding
 import com.atimi.cvapp.presentation.CvAdapter
 import kotlinx.android.synthetic.main.cv_fragment.*
 import android.util.Log
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
 
-class CvFragment : Fragment() {
+class CvFragment() : Fragment(), OnRefreshListener {
 
     private val TAG = "CvFragment"
     private val WRITE_EXTERNAL_REQUEST_CODE = 100
@@ -46,31 +45,51 @@ class CvFragment : Fragment() {
         cvViewModel = ViewModelProviders.of(this).get(CvViewModel::class.java)
 
         val layoutManager = LinearLayoutManager(context)
-
         recyclerView.layoutManager = layoutManager
         recyclerView.hasFixedSize()
         recyclerView.adapter = CvAdapter()
 
         binding.cvViewModel = cvViewModel
 
+
         //Verify that the external strage is mounted and available for reading and writing
         if (!isExternalStorageReadable() || !isExternalStorageWritable()) {
             //This is an error application should not continue
             Log.d(TAG,"Failed to find external storage")
         } else {
-            //Check if you have network persmission, trigger download of file if necessary
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (checkSelfPermission(this.requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PermissionChecker.PERMISSION_DENIED) {
-                    requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),WRITE_EXTERNAL_REQUEST_CODE)
+            if (cvViewModel.repository.isValid(requireContext())) {
+                refreshCache()
+            } else {
+                // There's no valid file, check if you have network permission,
+                // trigger download of file if necessary
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkSelfPermission(
+                            this.requireContext(),
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ) == PermissionChecker.PERMISSION_DENIED
+                    ) {
+                        requestPermissions(
+                            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                            WRITE_EXTERNAL_REQUEST_CODE
+                        )
+                    } else {
+                        //Runtime permission already granted
+                        refreshCache()
+                    }
                 } else {
-                    //Runtime permission already granted
+                    //No need for runtime permission, version older than Marshmallow
                     refreshCache()
                 }
-            } else {
-                //No need for runtime permission, version older than Marshmallow
-                refreshCache()
             }
         }
+
+        main.setOnRefreshListener(this)
+
+    }
+
+    override fun onRefresh() {
+        cvViewModel.repository.clean(requireContext())
+        refreshCache()
     }
 
     fun isExternalStorageWritable(): Boolean {
@@ -83,7 +102,9 @@ class CvFragment : Fragment() {
     }
 
     fun refreshCache() {
-        context.let { if (it != null) cvViewModel.refresh(it) }
+        cvViewModel.refresh(requireContext()) {
+            main.isRefreshing=false
+        }
     }
 
     override fun onRequestPermissionsResult(

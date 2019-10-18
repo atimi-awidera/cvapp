@@ -13,14 +13,18 @@ class CvViewModel : ViewModel() {
     var repository: CvRepository = CvRepository()
     val entries: MutableLiveData<List<CvEntry>> =
         MutableLiveData<List<CvEntry>>().apply { value = repository.getCvEntries() }
+    lateinit var readyCallback: () -> Unit
 
     val onDocumentReadyCallback = object : OnDocumentReadyCallback {
         override fun onDocumentReady(document: CvDocument) {
             entries.value = repository.getCvEntries()
+            readyCallback()
         }
     }
 
-    fun refresh(context: Context){
+    fun refresh(context: Context, readyCallback: () -> Unit) {
+        //A bit hacky, assumes there's only one listener at a time
+        this.readyCallback = readyCallback
         repository.refresh(context, onDocumentReadyCallback)
     }
 

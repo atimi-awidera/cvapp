@@ -22,38 +22,65 @@ class CvRepository {
         return document.getEntries()
     }
 
+    fun clean(context: Context) {
+        val jsonFile = File(context.getExternalFilesDir(
+            Environment.DIRECTORY_DOCUMENTS), "cv.json")
+        if (jsonFile.exists() && jsonFile.isFile) {
+            jsonFile.delete()
+        }
+    }
+
+    fun isValid(context: Context) : Boolean {
+        val jsonFile = File(context.getExternalFilesDir(
+            Environment.DIRECTORY_DOCUMENTS), "cv.json")
+        return jsonFile.exists() && jsonFile.isFile
+    }
+
     fun refresh(context: Context, callback: OnDocumentReadyCallback) {
-        doAsync {
-            val tmpDir = context.getCacheDir()
-            val tmpFile = File.createTempFile("downloaded_cv", "json", tmpDir)
-            //Having URL inside R provides possibility for different resumes for various locales
-            val url = URL(context.getString(R.string.remote_cv_url))
-            val inputStream = BufferedReader(InputStreamReader(url.openStream()))
-            var line: String?
-            try {
-                val out = FileOutputStream(tmpFile)
-                while ( true ) {
-                    line = inputStream.readLine()
-                    if (line == null) {
-                        break
+        if (isValid(context)) {
+            restore(context, callback)
+        } else {
+            doAsync {
+                val tmpDir = context.getCacheDir()
+                val tmpFile = File.createTempFile("downloaded_cv", "json", tmpDir)
+                //Having URL inside R provides possibility for different resumes for various locales
+                val url = URL(context.getString(R.string.remote_cv_url))
+                val inputStream = BufferedReader(InputStreamReader(url.openStream()))
+                var line: String?
+                try {
+                    val out = FileOutputStream(tmpFile)
+                    while (true) {
+                        line = inputStream.readLine()
+                        if (line == null) {
+                            break
+                        }
+                        // It would be worth to sanitize the data at that stage even before
+                        // anything is written, for example checking for invalid characters here
+                        out.write(line.toByteArray())
                     }
-                    // It would be worth to sanitize the data at that stage even before
-                    // anything is written, for example checking for invalid characters here
-                    out.write(line.toByteArray())
+                    inputStream.close()
+                    out.close()
+                    //Once file is correctly downloaded to the tmp move it to the documents directory
+                    val outFile = File(
+                        context.getExternalFilesDir(
+                            Environment.DIRECTORY_DOCUMENTS
+                        ), "cv.json"
+                    )
+                    if (outFile.exists()) {
+                        outFile.delete()
+                    }
+                    tmpFile.copyTo(outFile)
+                    tmpFile.delete()
+                } catch (e: IOException) {
+                    Log.d(TAG, "Failed to properly download file")
                 }
-                inputStream.close()
-                out.close()
-                //Once file is correctly downloaded to the tmp move it to the documents directory
-                val outFile = File(context.getExternalFilesDir(
-                    Environment.DIRECTORY_DOCUMENTS), "cv.json")
-                if (outFile.exists()) {
-                    outFile.delete()
-                }
-                tmpFile.copyTo(outFile)
-                tmpFile.delete()
-            } catch (e: IOException) {
-                Log.d(TAG,"Failed to properly download file")
+                restore(context, callback)
             }
+        }
+    }
+
+    fun restore(context: Context, callback: OnDocumentReadyCallback) {
+        doAsync {
             val jsonFile = File(context.getExternalFilesDir(
                 Environment.DIRECTORY_DOCUMENTS), "cv.json")
             val jsonString = jsonFile.readText()

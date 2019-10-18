@@ -14,15 +14,12 @@ data class PersonalStatement(val statement:String): CvEntry {
     }
 }
 
-data class CvDocument( val personalDetails: PersonalDetails,
-                       val personalStatement: PersonalStatement) {
+data class CvDocument( val personalDetails: PersonalDetails? = null,
+                       val personalStatement: PersonalStatement? = null) {
     fun getEntries() : List<CvEntry> {
         val entries = mutableListOf<CvEntry>()
-        entries.add(personalDetails)
-        entries.add(personalStatement)
+        personalDetails.let { if (it != null) entries.add(it) }
+        personalStatement.let { if (it != null) entries.add(it) }
         return entries
     }
 }
-
-//Extension to get the class name
-val<T: Any> T.kClass: KClass<T> get() = javaClass.kotlin

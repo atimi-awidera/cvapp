@@ -1,19 +1,72 @@
 package com.atimi.cvapp.repository
 
+import android.content.Context
+import android.os.Environment
+import android.util.Log
+import com.atimi.cvapp.R
 import com.atimi.cvapp.model.CvDocument
+import com.atimi.cvapp.model.CvDocumentFactory
 import com.atimi.cvapp.model.CvEntry
-import com.atimi.cvapp.model.PersonalDetails
-import com.atimi.cvapp.model.PersonalStatement
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import java.io.*
+import java.net.URL
 
 class CvRepository {
 
-    private var entryCount = 20
+    private val TAG = "CvRepository"
+
+    var document:CvDocument = CvDocument()
 
     fun getCvEntries(): List<CvEntry> {
-        val personalDetails = PersonalDetails("Donald", "Duck")
-        val personalStatement = PersonalStatement("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget convallis metus. Nunc sodales enim at velit faucibus, ut congue felis rutrum. Donec sem libero, viverra quis velit eu, molestie dignissim lectus. Maecenas sit amet ullamcorper lectus. Integer ac justo vitae ante consectetur ultrices semper vel augue. Duis mauris velit, gravida non mi vitae, aliquet interdum orci. Proin purus enim, congue iaculis tincidunt non, cursus a massa.")
-
-        val cvDocument = CvDocument(personalDetails, personalStatement)
-        return cvDocument.getEntries()
+        return document.getEntries()
     }
+
+    fun refresh(context: Context, callback: OnDocumentReadyCallback) {
+        doAsync {
+            val tmpDir = context.getCacheDir()
+            val tmpFile = File.createTempFile("downloaded_cv", "json", tmpDir)
+            //Having URL inside R provides possibility for different resumes for various locales
+            val url = URL(context.getString(R.string.remote_cv_url))
+            val inputStream = BufferedReader(InputStreamReader(url.openStream()))
+            var line: String?
+            try {
+                val out = FileOutputStream(tmpFile)
+                while ( true ) {
+                    line = inputStream.readLine()
+                    if (line == null) {
+                        break
+                    }
+                    // It would be worth to sanitize the data at that stage even before
+                    // anything is written, for example checking for invalid characters here
+                    out.write(line.toByteArray())
+                }
+                inputStream.close()
+                out.close()
+                //Once file is correctly downloaded to the tmp move it to the documents directory
+                val outFile = File(context.getExternalFilesDir(
+                    Environment.DIRECTORY_DOCUMENTS), "cv.json")
+                if (outFile.exists()) {
+                    outFile.delete()
+                }
+                tmpFile.copyTo(outFile)
+                tmpFile.delete()
+            } catch (e: IOException) {
+                Log.d(TAG,"Failed to properly download file")
+            }
+            val jsonFile = File(context.getExternalFilesDir(
+                Environment.DIRECTORY_DOCUMENTS), "cv.json")
+            val jsonString = jsonFile.readText()
+            //This can fail, needs checking and proper error handling
+            val cvDocument = CvDocumentFactory().fromJSONString(jsonString)
+            document = cvDocument
+            uiThread {
+                callback.onDocumentReady(document)
+            }
+        }
+    }
+}
+
+interface OnDocumentReadyCallback {
+    fun onDocumentReady(document: CvDocument)
 }

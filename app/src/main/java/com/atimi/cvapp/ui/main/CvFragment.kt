@@ -1,19 +1,27 @@
 package com.atimi.cvapp.ui.main
 
+import android.Manifest
+import android.os.Build
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.os.Environment
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.PermissionChecker
+import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.atimi.cvapp.R
 import com.atimi.cvapp.databinding.CvFragmentBinding
 import com.atimi.cvapp.presentation.CvAdapter
 import kotlinx.android.synthetic.main.cv_fragment.*
+import android.util.Log
 
 class CvFragment : Fragment() {
+
+    private val TAG = "CvFragment"
+    private val WRITE_EXTERNAL_REQUEST_CODE = 100
 
     companion object {
         fun newInstance() = CvFragment()
@@ -26,7 +34,7 @@ class CvFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.cv_fragment, container, false)
+        binding = DataBindingUtil.inflate(inflater, com.atimi.cvapp.R.layout.cv_fragment, container, false)
 
         binding.setLifecycleOwner(this)
 
@@ -44,6 +52,58 @@ class CvFragment : Fragment() {
         recyclerView.adapter = CvAdapter()
 
         binding.cvViewModel = cvViewModel
+
+        //Verify that the external strage is mounted and available for reading and writing
+        if (!isExternalStorageReadable() || !isExternalStorageWritable()) {
+            //This is an error application should not continue
+            Log.d(TAG,"Failed to find external storage")
+        } else {
+            //Check if you have network persmission, trigger download of file if necessary
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(this.requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PermissionChecker.PERMISSION_DENIED) {
+                    requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),WRITE_EXTERNAL_REQUEST_CODE)
+                } else {
+                    //Runtime permission already granted
+                    refreshCache()
+                }
+            } else {
+                //No need for runtime permission, version older than Marshmallow
+                refreshCache()
+            }
+        }
+    }
+
+    fun isExternalStorageWritable(): Boolean {
+        return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+    }
+
+    fun isExternalStorageReadable(): Boolean {
+        return Environment.getExternalStorageState() in
+                setOf(Environment.MEDIA_MOUNTED, Environment.MEDIA_MOUNTED_READ_ONLY)
+    }
+
+    fun refreshCache() {
+        context.let { if (it != null) cvViewModel.refresh(it) }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != WRITE_EXTERNAL_REQUEST_CODE) {
+            return
+        }
+        grantResults.forEach {
+            if(it != PermissionChecker.PERMISSION_GRANTED)
+            {
+                Log.d(TAG,"Failed to acquire sufficient permissions")
+                //A bit brute force, might be worth putting at least some alert here
+                activity?.finishAndRemoveTask()
+            }
+        }
+        refreshCache()
     }
 
 }

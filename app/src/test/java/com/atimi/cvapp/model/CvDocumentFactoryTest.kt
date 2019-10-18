@@ -46,11 +46,11 @@ class ExampleUnitTest {
         val personalStatement = PersonalStatement("C")
         val experienceHeader = ExperienceHeader("W")
         val experienceEntries = mutableListOf<ExperienceEntry>()
-        experienceEntries.add(ExperienceEntry("1"))
-        experienceEntries.add(ExperienceEntry("2"))
-        experienceEntries.add(ExperienceEntry("3"))
-        experienceEntries.add(ExperienceEntry("4"))
-        experienceEntries.add(ExperienceEntry("5"))
+        experienceEntries.add(ExperienceEntry("A","0-1","A1"))
+        experienceEntries.add(ExperienceEntry("B","2-3","B1"))
+        experienceEntries.add(ExperienceEntry("C","4-5","C1"))
+        experienceEntries.add(ExperienceEntry("D","6-7","D1"))
+        experienceEntries.add(ExperienceEntry("E","8-9","E1"))
         val cvDocument = CvDocument(personalDetails, personalStatement, experienceHeader, experienceEntries)
         var cvJSONDocument = documentFactory.fromJSONString("""
             {
@@ -65,11 +65,11 @@ class ExampleUnitTest {
                     title: "W"
                 },
                 experienceEntries: [
-                    { description="1" },
-                    { description="2" },
-                    { description="3" },
-                    { description="4" },
-                    { description="5" }
+                    { company="A", timeframe="0-1", description="A1" },
+                    { company="B", timeframe="2-3", description="B1" },
+                    { company="C", timeframe="4-5", description="C1" },
+                    { company="D", timeframe="6-7", description="D1" },
+                    { company="E", timeframe="8-9", description="E1" }
                 ]
             }
         """.trimIndent())

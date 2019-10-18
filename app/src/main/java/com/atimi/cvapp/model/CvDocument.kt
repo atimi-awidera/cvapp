@@ -18,7 +18,7 @@ data class ExperienceHeader(val title:String): CvEntry {
     }
 }
 
-data class ExperienceEntry(val description:String): CvEntry {
+data class ExperienceEntry(val company: String, val timeframe: String, val description:String): CvEntry {
     override fun getType() : String {
         return "Experience Entry"
     }

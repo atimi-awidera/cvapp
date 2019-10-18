@@ -26,8 +26,6 @@ class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
     private val personalStatement = 2
     private val experienceHeader = 3
     private val experienceEntry = 4
-    private val educationHeader = 5
-    private val educationEntry = 6
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         if (viewType == personalDetails) {
@@ -138,6 +136,8 @@ class CvAdapter : RecyclerView.Adapter<CvAdapter.ViewHolder>() {
     ) : ViewHolder(binding.root) {
         fun bind(item: ExperienceEntry) {
             binding.description = item.description
+            binding.timeframe = item.timeframe
+            binding.company = item.company
         }
     }
 }
